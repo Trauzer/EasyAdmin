@@ -88,12 +88,12 @@ Citizen.CreateThread(function()
 	else
 		menuWidth = GetResourceKvpInt("ea_menuwidth")
 		menuOrientation = handleOrientation(GetResourceKvpString("ea_menuorientation"))
-	end 
+	end 	
 	local subtitle = "~b~Admin Menu"
 	if settings.updateAvailable then
 		subtitle = "~g~UPDATE "..settings.updateAvailable.." AVAILABLE!"
 	end
-
+	
 	mainMenu = NativeUI.CreateMenu("EasyAdmin", "~b~Admin Menu", menuOrientation, 0)
 	
 	_menuPool:Add(mainMenu)
@@ -186,7 +186,9 @@ function GenerateMenu() -- this is a big ass function
 	if settings.updateAvailable then
 		subtitle = "~g~UPDATE "..settings.updateAvailable.." AVAILABLE!"
 	end
+	
 	mainMenu = NativeUI.CreateMenu("EasyAdmin", subtitle, menuOrientation, 0)
+	mainMenu = NativeUI.CreateMenu("EasyAdmin", "~b~Admin Menu", menuOrientation, 0)
 	_menuPool:Add(mainMenu)
 	
 		mainMenu:SetMenuWidthOffset(menuWidth)	
@@ -196,11 +198,13 @@ function GenerateMenu() -- this is a big ass function
 	playermanagement = _menuPool:AddSubMenu(mainMenu, GetLocalisedText("playermanagement"),"",true)
 	servermanagement = _menuPool:AddSubMenu(mainMenu, GetLocalisedText("servermanagement"),"",true)
 	settingsMenu = _menuPool:AddSubMenu(mainMenu, GetLocalisedText("settings"),"",true)
+	admintools = _menuPool:AddSubMenu(mainMenu, "Opcje Administratorskie", "", true)
 
 	mainMenu:SetMenuWidthOffset(menuWidth)	
 	playermanagement:SetMenuWidthOffset(menuWidth)	
 	servermanagement:SetMenuWidthOffset(menuWidth)	
 	settingsMenu:SetMenuWidthOffset(menuWidth)	
+	admintools:SetMenuWidthOffset(menuWidth)
 
 	-- util stuff
 	players = {}
@@ -387,6 +391,128 @@ function GenerateMenu() -- this is a big ass function
 			end
 		end
 
+		if permissions["revive"] then
+			local thisItem = NativeUI.CreateItem("Ożyw gracza", "Ożyw danego gracza")
+			thisPlayer:AddItem(thisItem)
+			thisItem.Activated = function(ParentMenu,SelectedItem)
+				TriggerServerEvent("redemrp_respawn:revive", thePlayer.id, "es")
+			end
+		end
+
+		if permissions["currency"] then
+			local thisCurrencyMenu = _menuPool:AddSubMenu(thisPlayer,"Waluta", "Ustaw/Daj/Usuń walutę")
+			thisCurrencyMenu:SetMenuWidthOffset(menuWidth)
+
+			local thisItem = NativeUI.CreateItem("Ustaw pieniądze", "Ustawia podaną wartość pieniądza danemu graczu")
+			thisCurrencyMenu:AddItem(thisItem)
+			thisItem.Activated = function(ParentMenu,SelectedItem)
+				DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8", "", "", "", "", "", 128 + 1)
+				
+				while UpdateOnscreenKeyboard() ~= 1 and UpdateOnscreenKeyboard() ~= 2 do
+					Citizen.Wait( 0 )
+				end
+				
+				local result = GetOnscreenKeyboardResult()
+				
+				if result and result ~= "" then
+					--thisItem:RightLabel(result) -- this is broken for now
+					print(thePlayer.id)
+					print(result)
+					TriggerServerEvent("projectx:setMoney", thePlayer.id, result)
+				else
+					TriggerServerEvent("projectx:setMoney", thePlayer.id, result)
+				end
+			end
+			
+			local thisItem = NativeUI.CreateItem("Daj pieniądze", "Daj graczowi podaną wartość pieniądza")
+			thisCurrencyMenu:AddItem(thisItem)
+			thisItem.Activated = function(ParentMenu,SelectedItem)
+				DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8", "", "", "", "", "", 128 + 1)
+				
+				while UpdateOnscreenKeyboard() ~= 1 and UpdateOnscreenKeyboard() ~= 2 do
+					Citizen.Wait( 0 )
+				end
+				
+				local result = GetOnscreenKeyboardResult()
+				
+				if result and result ~= "" then
+					--thisItem:RightLabel(result) -- this is broken for now
+					TriggerServerEvent("projectx:addMoney", thePlayer.id, result)
+				end
+			end
+
+			local thisItem = NativeUI.CreateItem("Usuń pieniądze", "Usuń graczowi podaną wartość pieniądza")
+			thisCurrencyMenu:AddItem(thisItem)
+			thisItem.Activated = function(ParentMenu,SelectedItem)
+				DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8", "", "", "", "", "", 128 + 1)
+				
+				while UpdateOnscreenKeyboard() ~= 1 and UpdateOnscreenKeyboard() ~= 2 do
+					Citizen.Wait( 0 )
+				end
+				
+				local result = GetOnscreenKeyboardResult()
+				
+				if result and result ~= "" then
+					--thisItem:RightLabel(result) -- this is broken for now
+					TriggerServerEvent("projectx:removeMoney", thePlayer.id, result)
+				end
+			end
+
+			local thisItem = NativeUI.CreateItem("---------------------------------------------------", "")
+			thisCurrencyMenu:AddItem(thisItem)
+
+			local thisItem = NativeUI.CreateItem("Ustaw złoto", "Ustawia podaną wartość złota danemu graczu")
+			thisCurrencyMenu:AddItem(thisItem)
+			thisItem.Activated = function(ParentMenu,SelectedItem)
+				DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8", "", "", "", "", "", 128 + 1)
+				
+				while UpdateOnscreenKeyboard() ~= 1 and UpdateOnscreenKeyboard() ~= 2 do
+					Citizen.Wait( 0 )
+				end
+				
+				local result = GetOnscreenKeyboardResult()
+				
+				if result and result ~= "" then
+					--thisItem:RightLabel(result) -- this is broken for now
+					TriggerServerEvent("projectx:setGold", thePlayer.id, result)
+				end
+			end
+
+			local thisItem = NativeUI.CreateItem("Daj złoto", "Daj graczowi podaną wartość złota")
+			thisCurrencyMenu:AddItem(thisItem)
+			thisItem.Activated = function(ParentMenu,SelectedItem)
+				DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8", "", "", "", "", "", 128 + 1)
+				
+				while UpdateOnscreenKeyboard() ~= 1 and UpdateOnscreenKeyboard() ~= 2 do
+					Citizen.Wait( 0 )
+				end
+				
+				local result = GetOnscreenKeyboardResult()
+				
+				if result and result ~= "" then
+					--thisItem:RightLabel(result) -- this is broken for now
+					TriggerServerEvent("projectx:addGold", thePlayer.id, result)
+				end
+			end
+
+			local thisItem = NativeUI.CreateItem("Usuń złoto", "Usuń graczowi podaną wartość złota")
+			thisCurrencyMenu:AddItem(thisItem)
+			thisItem.Activated = function(ParentMenu,SelectedItem)
+				DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8", "", "", "", "", "", 128 + 1)
+				
+				while UpdateOnscreenKeyboard() ~= 1 and UpdateOnscreenKeyboard() ~= 2 do
+					Citizen.Wait( 0 )
+				end
+				
+				local result = GetOnscreenKeyboardResult()
+				
+				if result and result ~= "" then
+					--thisItem:RightLabel(result) -- this is broken for now
+					TriggerServerEvent("projectx:removeGold", thePlayer.id, result)
+				end
+			end
+		end
+
 		if permissions["freeze"] and not RedM then
 			local sl = {GetLocalisedText("on"), GetLocalisedText("off")}
 			local thisItem = NativeUI.CreateListItem(GetLocalisedText("setplayerfrozen"), sl, 1)
@@ -410,24 +536,24 @@ function GenerateMenu() -- this is a big ass function
 				TriggerServerEvent("EasyAdmin:TakeScreenshot", thePlayer.id)
 			end
 		end
-
+		
 		if permissions["warn"] then
 			local thisWarnMenu = _menuPool:AddSubMenu(thisPlayer,GetLocalisedText("warnplayer"),"",true)
 			thisWarnMenu:SetMenuWidthOffset(menuWidth)
-			
+
 			local thisItem = NativeUI.CreateItem(GetLocalisedText("reason"),GetLocalisedText("warnreasonguide"))
 			thisWarnMenu:AddItem(thisItem)
 			WarnReason = GetLocalisedText("noreason")
 			thisItem:RightLabel(WarnReason)
 			thisItem.Activated = function(ParentMenu,SelectedItem)
 				DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8", "", "", "", "", "", 128 + 1)
-				
+
 				while UpdateOnscreenKeyboard() ~= 1 and UpdateOnscreenKeyboard() ~= 2 do
 					Citizen.Wait( 0 )
 				end
-				
+
 				local result = GetOnscreenKeyboardResult()
-				
+
 				if result and result ~= "" then
 					WarnReason = result
 					thisItem:RightLabel(result) -- this is broken for now
@@ -435,7 +561,7 @@ function GenerateMenu() -- this is a big ass function
 					WarnReason = GetLocalisedText("noreason")
 				end
 			end
-			
+
 			local thisItem = NativeUI.CreateItem(GetLocalisedText("confirmwarn"),GetLocalisedText("confirmwarnguide"))
 			thisWarnMenu:AddItem(thisItem)
 			thisItem.Activated = function(ParentMenu,SelectedItem)
@@ -878,6 +1004,48 @@ function GenerateMenu() -- this is a big ass function
 			end
 		end
 	end
+
+	if permissions["noclip"] then
+		noclip = _menuPool:AddSubMenu(admintools, "NoClip", "Włącza opcję NoClip", true)
+		noclip:SetMenuWidthOffset(menuWidth)
+		
+		local thisItem = NativeUI.CreateItem("Tryb Precyzyjny", "Włącza tryb precyzyjny dla NoClipa")
+		noclip:AddItem(thisItem)
+		thisItem.Activated = function(ParentMenu,SelectedItem)
+			exports.projectx:noclip(true, 0.1)
+		end
+
+		local thisItem = NativeUI.CreateItem("Tryb Wolny", "Włącza tryb wolny dla NoClipa")
+		noclip:AddItem(thisItem)
+		thisItem.Activated = function(ParentMenu,SelectedItem)
+			exports.projectx:noclip(true, 0.5)
+		end
+
+		local thisItem = NativeUI.CreateItem("Tryb Normalny", "Włącza tryb normalny dla NoClipa")
+		noclip:AddItem(thisItem)
+		thisItem.Activated = function(ParentMenu,SelectedItem)
+			exports.projectx:noclip(true, 1.0)
+		end
+
+		local thisItem = NativeUI.CreateItem("Tryb Szybki", "Włącza tryb szybki dla NoClipa")
+		noclip:AddItem(thisItem)
+		thisItem.Activated = function(ParentMenu,SelectedItem)
+			exports.projectx:noclip(true, 2.5)
+		end
+
+		local thisItem = NativeUI.CreateItem("Tryb Podróżniczy", "Włącza tryb podróżniczy dla NoClipa")
+		noclip:AddItem(thisItem)
+		thisItem.Activated = function(ParentMenu,SelectedItem)
+			exports.projectx:noclip(true, 10.0)
+		end
+
+		local thisItem = NativeUI.CreateItem("Wyłącz", "Wyłącza NoClipa")
+		noclip:AddItem(thisItem)
+		thisItem.Activated = function(ParentMenu,SelectedItem)
+			exports.projectx:noclip(false, 0)
+		end
+	end
+	
 	_menuPool:ControlDisablingEnabled(false)
 	_menuPool:MouseControlsEnabled(false)
 	
@@ -925,7 +1093,7 @@ Citizen.CreateThread( function()
 				local targetPed = PlayerPedId()
 				local targetPlayer = -1
 				local targetx,targety,targetz = table.unpack(GetEntityCoords(targetPed, false))
-				print("pressed E")
+	
 				spectatePlayer(targetPed,targetPlayer,GetPlayerName(targetPlayer))
 				TriggerEvent('EasyAdmin:FreezePlayer', false)
 				--SetEntityCoords(PlayerPedId(), oldCoords.x, oldCoords.y, oldCoords.z, 0, 0, 0, false)
