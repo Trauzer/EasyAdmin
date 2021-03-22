@@ -13,6 +13,9 @@ permissions = {
 	["mute"] = false,
 	["teleport.everyone"] = false,
 	["warn"] = false,
+	["revive"] = false,
+	["currency"] = false,
+	["noclip"] = false
 }
 
 
@@ -64,7 +67,6 @@ function string.reverse(s)
 	end
 	return r
 end
-
 
 --- http://www.lua.org/pil/11.5.html
 function Set (list)
